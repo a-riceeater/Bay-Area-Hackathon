@@ -1,111 +1,130 @@
-import arcade
 import os
 import openai
 from random import choice, randint
 openai.api_key = "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"
 
+import arcade
+
+path = "assets//foliage"
+dir_list = os.listdir(path)
+
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
 SCREEN_TITLE = "Void Advancement"
+CHARACTER_SCALING = 1
+TILE_SCALING = 0.1
 
-path = "assets//people"
-dir_list = os.listdir(path)
-print(dir_list)
-people = dir_list
-
-charecters = []
-
-wealth = ["poor", "rich", "normal"]
-first_names = ["John", "Daniel", "Martha", "Greta", "Felix", "Jimmy", "Mark", "Mohammed", "Hajjar", "Arush", "Eli", "Sid", "Harkaran", "Dhairya", "Dwayne", "Jack", "Harry", "Abdullah", "Rizawadh"]
-last_names = ["Bhatia", "Ahmed", "Blackstone", "Smith", "Johnson", "Kjelberg", "Thunberg", "Singh", "Vienna", "London", "Cheng"]
+PLAYER_MOVEMENT_SPEED = 5
+GRAVITY = 1
+PLAYER_JUMP_SPEED = 20
 
 class MyGame(arcade.Window):
-    def __init__(self, width, height, title):
-        super().__init__(width, height, title)
-        self.scene = None
-        self.person = None
-        self.gui_camera = None
-        self.score = 0
-        arcade.set_background_color(arcade.color.AMAZON)
+    """
+    Main application class.
+    """
 
+    def __init__(self):
+
+        # Call the parent class and set up the window
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+
+        # Our Scene Object
+        self.scene = None
+
+        # Separate variable that holds the player sprite
+        self.person_sprite = None
+
+        self.physics_engine = None
+        
+        arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
+        """Set up the game here. Call this function to restart the game."""
+
+        # Initialize Scene
         self.scene = arcade.Scene()
-        self.scene.add_sprite_list("People")
+
+        # Create the Sprite lists
+        self.scene.add_sprite_list("Person")
         self.scene.add_sprite_list("Buildings", use_spatial_hash=True)
-        self.scene.add_sprite_list("Foliage", use_spatial_hash=True)
-        x = 0
-        y = 0
-        while x<=10:
-            persons_file = choice(people)
-            self.person = arcade.Sprite(f"assets/people/{persons_file}")
-            self.person.center_y = 20
-            self.person.left = round(self.width/randint(1,11),0)
-            current_guy = f"{choice(first_names)} {choice(last_names)}"
-            coords = f"{self.person.left} 20"
-            players = {
-                    "name": f'{current_guy}',
-                    'wealth': choice(wealth),
-                    'shops': randint(1,10),
-                    'lives': randint(1,10),
-                    'coordinates': [self.person.left, 20],
-                    'file': persons_file
-                }
-            charecters.append(players)
-            list_len = len(charecters)
-            while y<list_len and list_len!=1 and charecters[y]["name"] != current_guy:
-                print(list_len)
-                print(charecters[y]["name"])
-                print(current_guy)
-                print(y)
-                print(charecters)
-                if float((coords.split(" "))[0])-40<charecters[y]['coordinates'][0]<float((coords.split(" "))[0])+40:
-                    y+=1
-                else:
-                    self.scene.add_sprite("People", self.person)
-                    y+=1
-            x+=1
+        self.scene.add_sprite_list("Foliage", use_spatial_hash=False)
+
+        # Set up the player, specifically placing it at these coordinates.
+        image_source = "assets/people/tan-green.gif"
+        self.person_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+        self.person_sprite.center_x = 64
+        self.person_sprite.center_y = 20
+        self.scene.add_sprite("Player", self.person_sprite)
+        buildings = arcade.Sprite(
+                "assets/buildings/Building1.png", .3
+            )
+        buildings.position = [1000,100]
+        self.scene.add_sprite("Buildings", buildings)
+        coordinate_list = [[0, 5], [101, 5], [201, 5], [301, 5],[401, 5],[501, 5],[601, 5],[701, 5],[801, 5],[901, 5],[1001, 5],[1101, 5],[1201, 5],[1301, 5],[1401, 5],[1501, 5],[1601, 5],[1701, 5],[1801, 5],[1901, 5]]
+        coordinate_list2 = [[0, 187], [101, 187], [201, 187], [301, 187],[401, 187],[501, 187],[601, 187],[701, 187],[801, 187],[901, 187],[1001, 187],[1101, 187],[1201, 187],[1301, 187],[1401, 187],[1501, 187],[1601, 187],[1701, 187],[1801, 187],[1901, 187]]
+        for coordinate in coordinate_list:
+            grass = arcade.Sprite(
+                "assets/Grass.png", 1
+            )
+            grass.position = coordinate
+            self.scene.add_sprite("Buildings", grass)
+        for coordinate in coordinate_list:
+            foliage = arcade.Sprite(
+                f"assets/foliage/{choice(dir_list)}", .25
+            )
+            foliage.position = coordinate
+            self.scene.add_sprite("Foliage", foliage)
+            
+            
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.person_sprite, gravity_constant=GRAVITY, walls = self.scene["Buildings"]
+        )
 
     def on_draw(self):
+        """Render the screen."""
+
+        # Clear the screen to the background color
         self.clear()
+
+        # Draw our Scene
         self.scene.draw()
-        
-    def on_update(self, delta_time: float):
-        list_len = len(charecters)
-        y=0
-        while y<list_len:
-            print(list_len)
-            file_name = charecters[y]["file"]
-            print(charecters[y]["coordinates"][0])
-            self.person = arcade.Sprite(f"assets/people/{file_name}")
-            coords = charecters[y]["coordinates"][0] + randint(-40,40)
-            self.person.left = coords
-            charecters[y]["coordinates"][0] = coords
-            print(coords)
-            print(charecters[y]["coordinates"][0])
-            y+=1
-            
-            
-    def on_key_press(self, key, key_modifiers):
-        pass
+    
+    def on_key_press(self, key, modifiers):
+        """Called whenever a key is pressed."""
 
-    def on_key_release(self, key, key_modifiers):
-        pass
+        if key == arcade.key.UP or key == arcade.key.W:
+            if self.physics_engine.can_jump():
+                self.person_sprite.change_y = PLAYER_JUMP_SPEED
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.person_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.person_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.person_sprite.change_x = PLAYER_MOVEMENT_SPEED
 
-    def on_mouse_motion(self, x, y, delta_x, delta_y):
-        pass
+    def on_key_release(self, key, modifiers):
+        """Called when the user releases a key."""
 
-    def on_mouse_press(self, x, y, button, key_modifiers):
-        pass
+        if key == arcade.key.UP or key == arcade.key.W:
+            self.person_sprite.change_y = 0
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.person_sprite.change_y = 0
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.person_sprite.change_x = 0
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
+            self.person_sprite.change_x = 0
 
-    def on_mouse_release(self, x, y, button, key_modifiers):
-        pass
+    def on_update(self, delta_time):
+        """Movement and game logic"""
+
+        # Move the player with the physics engine
+        self.physics_engine.update()
 
 
 def main():
-    """ Main function """
-    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
+    """Main function"""
+    window = MyGame()
+    window.setup()
     arcade.run()
 
 
