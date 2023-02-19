@@ -13,6 +13,8 @@ dir_list = os.listdir(path)
 print(dir_list)
 people = dir_list
 
+charecters = []
+
 wealth = ["poor", "rich", "normal"]
 first_names = ["John", "Daniel", "Martha", "Greta", "Felix", "Jimmy", "Mark", "Mohammed", "Hajjar", "Arush", "Eli", "Sid", "Harkaran", "Dhairya", "Dwayne", "Jack", "Harry", "Abdullah", "Rizawadh"]
 last_names = ["Bhatia", "Ahmed", "Blackstone", "Smith", "Johnson", "Kjelberg", "Thunberg", "Singh", "Vienna", "London", "Cheng"]
@@ -22,6 +24,8 @@ class MyGame(arcade.Window):
         super().__init__(width, height, title)
         self.scene = None
         self.person = None
+        self.gui_camera = None
+        self.score = 0
         arcade.set_background_color(arcade.color.AMAZON)
 
 
@@ -31,13 +35,31 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list("Buildings", use_spatial_hash=True)
         self.scene.add_sprite_list("Foliage", use_spatial_hash=True)
         x = 0
+        y = 0
         while x<=10:
             self.person = arcade.Sprite(f"assets/people/{choice(people)}")
             self.person.center_y = 20
-            self.person.left = self.width/randint(1,40)
-            self.scene.add_sprite("People", self.person)
-            if arcade.check_for_collision(self.person, self.person):
-                self.person.left = self.width/randint(1,15)
+            self.person.left = round(self.width/randint(1,11),0)
+            current_guy = f"{choice(first_names)} {choice(last_names)}"
+            coords = f"{self.person.left} 20"
+            players ={
+                    "name": f'{current_guy}',
+                    'wealth': choice(wealth),
+                    'shops': randint(1,10),
+                    'lives': randint(1,10),
+                    'coordinates': [self.person.left, 20],
+                }
+            charecters.append(players)
+            list_len = len(charecters)
+            while y<list_len and list_len!=1 and charecters[y]["name"] != current_guy:
+                print(list_len)
+                print(y)
+                print(charecters)
+                if int((coords.split(" "))[1])-20<charecters[y]['coordinates'][1]<int((coords.split(" "))[1])+20:
+                    self.scene.add_sprite("People", self.person)
+                else:
+                    pass
+                y+=1
             x+=1
 
     def on_draw(self):
