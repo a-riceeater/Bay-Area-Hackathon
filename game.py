@@ -2,6 +2,7 @@ import arcade
 import os
 import openai
 from random import choice, randint
+openai.api_key = "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"
 
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -11,6 +12,10 @@ path = "assets//people"
 dir_list = os.listdir(path)
 print(dir_list)
 people = dir_list
+
+wealth = ["poor", "rich", "normal"]
+first_names = ["John", "Daniel", "Martha", "Greta", "Felix", "Jimmy", "Mark", "Mohammed", "Hajjar", "Arush", "Eli", "Sid", "Harkaran", "Dhairya", "Dwayne", "Jack", "Harry", "Abdullah", "Rizawadh"]
+last_names = ["Bhatia", "Ahmed", "Blackstone", "Smith", "Johnson", "Kjelberg", "Thunberg", "Singh", "Vienna", "London", "Cheng"]
 
 class MyGame(arcade.Window):
     def __init__(self, width, height, title):
@@ -25,18 +30,25 @@ class MyGame(arcade.Window):
         self.scene.add_sprite_list("People")
         self.scene.add_sprite_list("Buildings", use_spatial_hash=True)
         self.scene.add_sprite_list("Foliage", use_spatial_hash=True)
-        self.person = arcade.Sprite(f"assets/people/{choice(people)}")
-        self.person.center_y = self.height/2
-        self.person.left = 10
-        self.scene.add_sprite("People", self.person)
+        x = 0
+        while x<=10:
+            self.person = arcade.Sprite(f"assets/people/{choice(people)}")
+            self.person.center_y = 20
+            self.person.left = self.width/randint(1,40)
+            self.scene.add_sprite("People", self.person)
+            choice()
+            if arcade.check_for_collision(self.person, self.person):
+                self.person.left = self.width/randint(1,15)
+            x+=1
 
     def on_draw(self):
         self.clear()
         self.scene.draw()
+        self.scene.draw()
+        self.scene.draw()
 
     def on_update(self, delta_time):
         pass
-
     def on_key_press(self, key, key_modifiers):
         pass
 
