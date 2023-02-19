@@ -1,6 +1,5 @@
 import arcade
 import os
-from time import sleep
 import openai
 from random import choice, randint
 
@@ -16,32 +15,24 @@ people = dir_list
 class MyGame(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.people_list = None
-        self.buildings_list = None
-        self.foliage_list = None
+        self.scene = None
         self.person = None
         arcade.set_background_color(arcade.color.AMAZON)
 
 
     def setup(self):
-        self.people_list = arcade.SpriteList()
-        self.buildings_list = arcade.SpriteList(use_spatial_hash=True)
-        self.foliage_list = arcade.SpriteList(use_spatial_hash=True)
-        self.all_sprites = arcade.SpriteList()
+        self.scene = arcade.Scene()
+        self.scene.add_sprite_list("People")
+        self.scene.add_sprite_list("Buildings", use_spatial_hash=True)
+        self.scene.add_sprite_list("Foliage", use_spatial_hash=True)
         self.person = arcade.Sprite(f"assets/people/{choice(people)}")
         self.person.center_y = self.height/2
         self.person.left = 10
-        self.people_list.append(self.person)
-        arcade.schedule(self.add_people, 0.25)
-        
-    def add_people(self, delta_time: float):
-        self.people = arcade.Sprite(f"assets/people/{choice(people)}")
-        self.people.left = randint(self.width, self.width + 80)
-        self.people.top = randint(10, self.height - 10)
+        self.scene.add_sprite("People", self.person)
 
     def on_draw(self):
         self.clear()
-        self.people_list.draw()
+        self.scene.draw()
 
     def on_update(self, delta_time):
         pass
