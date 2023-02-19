@@ -58,17 +58,17 @@ class MyGame(arcade.Window):
         buildings = arcade.Sprite(
                 "assets/buildings/Building1.png", .3
             )
-        buildings.position = [1000,100]
+        buildings.position = [1000,300]
         self.scene.add_sprite("Buildings", buildings)
         coordinate_list = [[0, 5], [101, 5], [201, 5], [301, 5],[401, 5],[501, 5],[601, 5],[701, 5],[801, 5],[901, 5],[1001, 5],[1101, 5],[1201, 5],[1301, 5],[1401, 5],[1501, 5],[1601, 5],[1701, 5],[1801, 5],[1901, 5]]
-        coordinate_list2 = [[0, 187], [201, 187],[401, 187],[601, 187],[801, 187],[1001, 187],[1201, 187],[1401, 187],[1601, 187],[1801, 187],[1901, 187]]
+        coordinate_list2 = [[0, 75], [201, 75],[401, 75],[601, 75],[801, 75],[1001, 75],[1201, 75],[1401, 75],[1601, 75],[1801, 75]]
         for coordinate in coordinate_list:
             grass = arcade.Sprite(
                 "assets/Grass.png", 1
             )
             grass.position = coordinate
             self.scene.add_sprite("Buildings", grass)
-        for coordinate in coordinate_list:
+        for coordinate in coordinate_list2:
             foliage = arcade.Sprite(
                 f"assets/foliage/{choice(dir_list)}", .25
             )
