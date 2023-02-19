@@ -46,7 +46,7 @@ class MyGame(arcade.Window):
 
         # Create the Sprite lists
         self.scene.add_sprite_list("Person")
-        self.scene.add_sprite_list("Buildings", use_spatial_hash=True)
+        self.scene.add_sprite_list("Buildings", use_spatial_hash=False)
         self.scene.add_sprite_list("Foliage", use_spatial_hash=False)
 
         # Set up the player, specifically placing it at these coordinates.
@@ -56,12 +56,12 @@ class MyGame(arcade.Window):
         self.person_sprite.center_y = 20
         self.scene.add_sprite("Player", self.person_sprite)
         buildings = arcade.Sprite(
-                "assets/buildings/Building1.png", .3
+                f"assets/buildings/Building{randint(1,3)}.png", .3
             )
         buildings.position = [1000,300]
         self.scene.add_sprite("Buildings", buildings)
         coordinate_list = [[0, 5], [101, 5], [201, 5], [301, 5],[401, 5],[501, 5],[601, 5],[701, 5],[801, 5],[901, 5],[1001, 5],[1101, 5],[1201, 5],[1301, 5],[1401, 5],[1501, 5],[1601, 5],[1701, 5],[1801, 5],[1901, 5]]
-        coordinate_list2 = [[0, 75], [201, 75],[401, 75],[601, 75],[801, 75],[1001, 75],[1201, 75],[1401, 75],[1601, 75],[1801, 75]]
+        coordinate_list2 = [[0, 87], [201, 87],[401, 87],[601, 87],[801, 87],[1001, 87],[1201, 87],[1401, 87],[1601, 87],[1801, 87]]
         for coordinate in coordinate_list:
             grass = arcade.Sprite(
                 "assets/Grass.png", 1
