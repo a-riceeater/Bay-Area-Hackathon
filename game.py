@@ -37,39 +37,55 @@ class MyGame(arcade.Window):
         x = 0
         y = 0
         while x<=10:
-            self.person = arcade.Sprite(f"assets/people/{choice(people)}")
+            persons_file = choice(people)
+            self.person = arcade.Sprite(f"assets/people/{persons_file}")
             self.person.center_y = 20
             self.person.left = round(self.width/randint(1,11),0)
             current_guy = f"{choice(first_names)} {choice(last_names)}"
             coords = f"{self.person.left} 20"
-            players ={
+            players = {
                     "name": f'{current_guy}',
                     'wealth': choice(wealth),
                     'shops': randint(1,10),
                     'lives': randint(1,10),
                     'coordinates': [self.person.left, 20],
+                    'file': persons_file
                 }
             charecters.append(players)
             list_len = len(charecters)
             while y<list_len and list_len!=1 and charecters[y]["name"] != current_guy:
                 print(list_len)
+                print(charecters[y]["name"])
+                print(current_guy)
                 print(y)
                 print(charecters)
-                if int((coords.split(" "))[1])-20<charecters[y]['coordinates'][1]<int((coords.split(" "))[1])+20:
-                    self.scene.add_sprite("People", self.person)
+                if float((coords.split(" "))[0])-40<charecters[y]['coordinates'][0]<float((coords.split(" "))[0])+40:
+                    y+=1
                 else:
-                    pass
-                y+=1
+                    self.scene.add_sprite("People", self.person)
+                    y+=1
             x+=1
 
     def on_draw(self):
         self.clear()
         self.scene.draw()
-        self.scene.draw()
-        self.scene.draw()
-
-    def on_update(self, delta_time):
-        pass
+        
+    def on_update(self, delta_time: float):
+        list_len = len(charecters)
+        y=0
+        while y<list_len:
+            print(list_len)
+            file_name = charecters[y]["file"]
+            print(charecters[y]["coordinates"][0])
+            self.person = arcade.Sprite(f"assets/people/{file_name}")
+            coords = charecters[y]["coordinates"][0] + randint(-40,40)
+            self.person.left = coords
+            charecters[y]["coordinates"][0] = coords
+            print(coords)
+            print(charecters[y]["coordinates"][0])
+            y+=1
+            
+            
     def on_key_press(self, key, key_modifiers):
         pass
 
