@@ -36,7 +36,6 @@ class MyGame(arcade.Window):
             self.person.center_y = 20
             self.person.left = self.width/randint(1,40)
             self.scene.add_sprite("People", self.person)
-            choice()
             if arcade.check_for_collision(self.person, self.person):
                 self.person.left = self.width/randint(1,15)
             x+=1
