@@ -1,7 +1,11 @@
 import os
 import openai
 from random import choice, randint
-openai.api_key = "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"
+import requests
+from keybert import KeyBERT
+from os.path  import basename
+from bs4 import BeautifulSoup
+openai.api_key = "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"
 
 import arcade
 import time
@@ -16,9 +20,9 @@ incr_tree = 0
 path = "assets//stars"
 dir_list = os.listdir(path)
 path2 = "assets//foliage"
-dir_list = os.listdir(path2)
+dir_list2 = os.listdir(path2)
 path3 = "assets//buildings"
-dir_list = os.listdir(path3)
+dir_list3 = os.listdir(path3)
 
 
 charecters = []
@@ -75,18 +79,35 @@ class MyGame(arcade.Window):
         # Initialize Scene
         self.scene = arcade.Scene()
         prompt = input("What do you want your world to be like:\n\n")
-        struc_query = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=f"Find the key words in: {prompt}",
-            max_tokens=7,
-            temperature=0
-        )["choices"][0]['text']
+        kw_model = KeyBERT()
+        struc_query = kw_model.extract_keywords(prompt)
+        print(struc_query)
         numb=0
-        while numb <dir_list:
+        while numb <len(dir_list3):
             image = openai.Image.create_edit(
-                image = open(dir_list)
-            )
-        
+                image = open(f"assets/buildings/{dir_list3[numb]}", "rb"),
+                mask = open("assets/buildings/mask.png","rb"),
+                prompt = f"Remake this using the following these key words: {struc_query}, pixel art style",
+                size = "1024x1024"
+            )["data"][0]["url"]
+            print(image)
+            img_data = requests.get(image).content 
+            with open(f'new_gen/buildings/Building{numb+1}.png', 'ab+') as handler: 
+                handler.write(img_data) 
+            numb+=1
+        numb = 0
+        while numb <len(dir_list2):
+            image = openai.Image.create_edit(
+                image = open(f"assets/foliage/{dir_list2[numb]}", "rb"),
+                mask = open("assets/foliage/mask.png","rb"),
+                prompt = f"Remake this using the following these key words: {struc_query}, pixel art style",
+                size = "1024x1024"
+            )["data"][0]["url"]
+            print(image)
+            img_data = requests.get(image).content 
+            with open(f'new_gen/foliage/Tree{numb+1}.png', 'ab+') as handler: 
+                handler.write(img_data) 
+            numb+=1
 
         # Create the Sprite lists
         self.scene.add_sprite_list("People")
@@ -114,14 +135,13 @@ class MyGame(arcade.Window):
 
         while incr_building <=100000:
             buildings = arcade.Sprite(
-                    f"assets/buildings/Building{randint(1,3)}.png", .3
+                    f"new_gen/buildings/Building{randint(1,3)}.png", .6
                 )
             buildings.position = [init_build[0]+incr_building, init_build[1]]
             buildings.z_order = 0
             self.scene.add_sprite("Buildings", buildings)
             incr_building+=600
             
-        coords_list = [[0,300], [353,300]]
         while incr<=100000:
                 grass = arcade.Sprite(
                     "assets/Grass.png", 1
@@ -147,7 +167,7 @@ class MyGame(arcade.Window):
             
         while incr_tree<=100000:
             foliage = arcade.Sprite(
-                f"assets/foliage/{choice(dir_list)}", .25
+                f"new_gen/foliage/{choice(dir_list)}", .5
             )
             foliage.position = [init_tree[0]+incr_tree, init_tree[1]]
             foliage.z_order = 3
