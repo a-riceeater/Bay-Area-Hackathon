@@ -88,7 +88,7 @@ class MyGame(arcade.Window):
             image = openai.Image.create_edit(
                 image = open(f"assets/buildings/Building{randint(1,3)}.png", "rb"),
                 mask = open("assets/buildings/mask.png","rb"),
-                prompt = f"Remake this using the following these key words: {struc_query}, pixel art style",
+                prompt = f"Remake this using the following these key words: {struc_query}, pixel art style, make it a shape of a building",
                 size = "1024x1024"
             )["data"][0]["url"]
             img_data = requests.get(image).content 
@@ -100,7 +100,7 @@ class MyGame(arcade.Window):
             image = openai.Image.create_edit(
                 image = open(f"assets/foliage/Tree{randint(1,4)}.png", "rb"),
                 mask = open("assets/foliage/mask.png","rb"),
-                prompt = f"Remake this using the following these key words: {struc_query}, pixel art style",
+                prompt = f"Remake this using the following these key words: {struc_query}, pixel art style, make it a shape of a tree",
                 size = "1024x1024"
             )["data"][0]["url"]
             img_data = requests.get(image).content 
