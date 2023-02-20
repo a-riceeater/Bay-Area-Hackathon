@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 from keybert import KeyBERT
 from os.path  import basename
 from bs4 import BeautifulSoup
+load_dotenv()
 
-openai.api_key = os.environ.get("api")
+openai.api_key = os.getenv('api')
 
 import arcade
 import time
@@ -25,8 +26,6 @@ path2 = "assets//foliage"
 dir_list2 = os.listdir(path2)
 path3 = "assets//buildings"
 dir_list3 = os.listdir(path3)
-
-load_dotenv()
 
 charecters = []
 
