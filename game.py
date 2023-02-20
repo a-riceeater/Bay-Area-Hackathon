@@ -6,10 +6,8 @@ from dotenv import load_dotenv
 from keybert import KeyBERT
 from os.path  import basename
 from bs4 import BeautifulSoup
-first_half = "sk-QJG4p6oeCfgM7qSxa5"
-second_half ="tvT3BlbkFJmi"
-third_half = "AOgWPiic6zV3suFvyf"
-openai.api_key = first_half+second_half+third_half
+
+openai.api_key = os.environ.get("api")
 
 import arcade
 import time
