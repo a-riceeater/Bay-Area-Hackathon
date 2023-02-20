@@ -13,10 +13,13 @@ incr_building = 0
 incr = 0
 incr_tree = 0
 
-path = "assets//foliage"
+path = "assets//stars"
 dir_list = os.listdir(path)
-path2 = "assets//people"
-dir_list2 = os.listdir(path2)
+path2 = "assets//foliage"
+dir_list = os.listdir(path2)
+path3 = "assets//buildings"
+dir_list = os.listdir(path3)
+
 
 charecters = []
 
@@ -71,15 +74,25 @@ class MyGame(arcade.Window):
         
         # Initialize Scene
         self.scene = arcade.Scene()
+        prompt = input("What do you want your world to be like:\n\n")
+        struc_query = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=f"Find the key words in: {prompt}",
+            max_tokens=7,
+            temperature=0
+        )["choices"][0]['text']
+        numb=0
+        while numb <dir_list:
+            image = openai.Image.create_edit(
+                image = open(dir_list)
+            )
         
-
 
         # Create the Sprite lists
         self.scene.add_sprite_list("People")
         self.scene.add_sprite_list("Buildings")
         self.scene.add_sprite_list("Grass", use_spatial_hash=True)
         self.scene.add_sprite_list("Foliage", use_spatial_hash=False)
-        y=0
         # Set up the player, specifically placing it at these coordinates.
         image_source = f"assets/people/white-blue2.png"
         self.person_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
@@ -96,7 +109,7 @@ class MyGame(arcade.Window):
                         'file': image_source
                     }
         charecters.append(players)
-        self.person_sprite.z = 10000
+        self.person_sprite.z_order = 4
         self.scene.add_sprite("People", self.person_sprite)
 
         while incr_building <=100000:
@@ -104,6 +117,7 @@ class MyGame(arcade.Window):
                     f"assets/buildings/Building{randint(1,3)}.png", .3
                 )
             buildings.position = [init_build[0]+incr_building, init_build[1]]
+            buildings.z_order = 0
             self.scene.add_sprite("Buildings", buildings)
             incr_building+=600
             
@@ -113,6 +127,7 @@ class MyGame(arcade.Window):
                     "assets/Grass.png", 1
                 )
                 grass.position = [init_coords[0]+incr,init_coords[1]]
+                grass.z_order = 2
                 self.scene.add_sprite("Grass", grass)
                 incr+=100
             
@@ -120,19 +135,22 @@ class MyGame(arcade.Window):
                 "assets/stars/Sun.png", .3
             )
         sun.position = [860,850]
+        sun.z_order = 4
         self.scene.add_sprite("Foliage", sun)
-            
-        for coordinate in coords_list:
+        
+        while incr<=100000:
             cloud = arcade.Sprite(
                 "assets/stars/Cloud1.png", 1
             )
-            
+            cloud.position = [init_coords[0]+incr,init_coords[1]+300]
+            self.scene.add_sprite("Foliage", cloud)
             
         while incr_tree<=100000:
             foliage = arcade.Sprite(
                 f"assets/foliage/{choice(dir_list)}", .25
             )
             foliage.position = [init_tree[0]+incr_tree, init_tree[1]]
+            foliage.z_order = 3
             self.scene.add_sprite("Foliage", foliage)
             incr_tree+=200
             
@@ -209,7 +227,6 @@ class MyGame(arcade.Window):
         charecters[0]['coordinates'][1] = self.person_sprite.change_y+self.person_sprite.center_y
         self.person_sprite.position = [charecters[0]['coordinates'][0], charecters[0]['coordinates'][1]]
         self.scene.get_sprite_list("People").clear()
-        self.person_sprite.z = 10000
         self.scene.add_sprite("People", self.person_sprite)
         self.score = round(self.score+1/10,0)
         # Move the player with the physics engine
