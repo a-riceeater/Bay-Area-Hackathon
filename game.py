@@ -5,6 +5,13 @@ openai.api_key = "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"
 
 import arcade
 
+init_coords = [1,5]
+init_tree = [1,75]
+init_build = [1000,200]
+incr_building = 0
+incr = 0
+incr_tree = 0
+
 path = "assets//foliage"
 dir_list = os.listdir(path)
 
@@ -36,11 +43,23 @@ class MyGame(arcade.Window):
 
         self.physics_engine = None
         
+        self.camera = None
+
+        self.end_of_map = 0
+        
+        self.gui_camera = None
+
+        self.score = 0      
+        
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
-
+        global incr, incr_tree, init_coords, init_tree, init_build, incr_building
+        self.camera = arcade.Camera(self.width, self.height)
+        self.gui_camera = arcade.Camera(self.width, self.height)
+        self.score = 0
+        
         # Initialize Scene
         self.scene = arcade.Scene()
 
@@ -56,26 +75,42 @@ class MyGame(arcade.Window):
         self.person_sprite.center_x = 64
         self.person_sprite.center_y = 10
         self.scene.add_sprite("Player", self.person_sprite)
-        buildings = arcade.Sprite(
-                f"assets/buildings/Building{randint(1,3)}.png", .3
+        while incr_building <=100000:
+            buildings = arcade.Sprite(
+                    f"assets/buildings/Building{randint(1,3)}.png", .3
+                )
+            buildings.position = [init_build[0]+incr_building, init_build[1]]
+            self.scene.add_sprite("Buildings", buildings)
+            incr_building+=600
+            
+        coords_list = [[0,300], [353,300]]
+        while incr<=100000:
+                grass = arcade.Sprite(
+                    "assets/Grass.png", 1
+                )
+                grass.position = [init_coords[0]+incr,init_coords[1]]
+                self.scene.add_sprite("Grass", grass)
+                incr+=100
+            
+        sun = arcade.Sprite(
+                "assets/stars/Sun.png", .3
             )
-        buildings.position = [1000,200]
-        self.scene.add_sprite("Buildings", buildings)
-        coordinate_list = [[0, 5], [101, 5], [201, 5], [301, 5],[401, 5],[501, 5],[601, 5],[701, 5],[801, 5],[901, 5],[1001, 5],[1101, 5],[1201, 5],[1301, 5],[1401, 5],[1501, 5],[1601, 5],[1701, 5],[1801, 5],[1901, 5]]
-        coordinate_list2 = [[0, 75], [201, 75],[401, 75],[601, 75],[801, 75],[1001, 75],[1201, 75],[1401, 75],[1601, 75],[1801, 75]]
-        for coordinate in coordinate_list:
-            grass = arcade.Sprite(
-                "assets/Grass.png", 1
+        sun.position = [860,850]
+        self.scene.add_sprite("Foliage", sun)
+            
+        for coordinate in coords_list:
+            cloud = arcade.Sprite(
+                "assets/stars/Cloud1.png", 1
             )
-            grass.position = coordinate
-            self.scene.add_sprite("Grass", grass)
-        for coordinate in coordinate_list2:
+            
+            
+        while incr_tree<=100000:
             foliage = arcade.Sprite(
                 f"assets/foliage/{choice(dir_list)}", .25
             )
-            foliage.position = coordinate
+            foliage.position = [init_tree[0]+incr_tree, init_tree[1]]
             self.scene.add_sprite("Foliage", foliage)
-            
+            incr_tree+=200
             
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.person_sprite, gravity_constant=GRAVITY, walls = self.scene["Grass"]
@@ -86,14 +121,42 @@ class MyGame(arcade.Window):
 
         # Clear the screen to the background color
         self.clear()
+        
+        self.camera.use()
 
         # Draw our Scene
         self.scene.draw()
+        self.gui_camera.use()
+
+        # Draw our score on the screen, scrolling it with the viewport
+        score_text = f"Score: {self.score}"
+        arcade.draw_text(
+            score_text,
+            10,
+            10,
+            arcade.csscolor.WHITE,
+            18,
+        )
+        
     
+    def center_camera_to_player(self):
+        screen_center_x = self.person_sprite.center_x - (self.camera.viewport_width / 2)
+        screen_center_y = self.person_sprite.center_y - (
+            self.camera.viewport_height / 2
+        )
+
+        # Don't let camera travel past 0
+        if screen_center_x < 0:
+            screen_center_x = 0
+        if screen_center_y < 0:
+            screen_center_y = 0
+        player_centered = screen_center_x, screen_center_y
+
+        self.camera.move_to(player_centered)
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
-
         if key == arcade.key.UP or key == arcade.key.W:
+            self.score +=1
             if self.physics_engine.can_jump():
                 self.person_sprite.change_y = PLAYER_JUMP_SPEED
         elif key == arcade.key.DOWN or key == arcade.key.S:
@@ -120,6 +183,7 @@ class MyGame(arcade.Window):
 
         # Move the player with the physics engine
         self.physics_engine.update()
+        self.center_camera_to_player()
 
 
 def main():
