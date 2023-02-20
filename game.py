@@ -2,10 +2,13 @@ import os
 import openai
 from random import choice, randint
 import requests
+from dotenv import load_dotenv
 from keybert import KeyBERT
 from os.path  import basename
 from bs4 import BeautifulSoup
-openai.api_key = "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"
+first_half = "sk-QJG4p6oeCfgM7qSxa5"
+second_half ="tvT3BlbkFJmiAOgWPiic6zV3suFvyf"
+openai.api_key = first_half+second_half
 
 import arcade
 import time
@@ -24,6 +27,7 @@ dir_list2 = os.listdir(path2)
 path3 = "assets//buildings"
 dir_list3 = os.listdir(path3)
 
+load_dotenv()
 
 charecters = []
 
@@ -191,7 +195,7 @@ class MyGame(arcade.Window):
         self.gui_camera.use()
 
         # Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Day {self.score}"
+        score_text = f"Hour {self.score}"
         arcade.draw_text(
             score_text,
             10,
@@ -248,7 +252,7 @@ class MyGame(arcade.Window):
         self.person_sprite.position = [charecters[0]['coordinates'][0], charecters[0]['coordinates'][1]]
         self.scene.get_sprite_list("People").clear()
         self.scene.add_sprite("People", self.person_sprite)
-        self.score = round(self.score+1/10,0)
+        self.score+=1
         # Move the player with the physics engine
         self.physics_engine.update()
         self.person_sprite.update_animation()
