@@ -72,21 +72,10 @@ class MyGame(arcade.Window):
         # Initialize Scene
         self.scene = arcade.Scene()
         
-        layer_options = {
-            LAYER_NAME_PLATFORMS: {
-                "use_spatial_hash": True,
-            },
-            LAYER_NAME_COINS: {
-                "use_spatial_hash": True,
-            },
-            LAYER_NAME_DONT_TOUCH: {
-                "use_spatial_hash": True,
-            },
-        }
 
 
         # Create the Sprite lists
-        self.scene.add_sprite_list("People", LAYER_NAME_BACKGROUND)
+        self.scene.add_sprite_list("People")
         self.scene.add_sprite_list("Buildings")
         self.scene.add_sprite_list("Grass", use_spatial_hash=True)
         self.scene.add_sprite_list("Foliage", use_spatial_hash=False)
@@ -107,6 +96,7 @@ class MyGame(arcade.Window):
                         'file': image_source
                     }
         charecters.append(players)
+        self.person_sprite.z = 10000
         self.scene.add_sprite("People", self.person_sprite)
 
         while incr_building <=100000:
@@ -219,6 +209,7 @@ class MyGame(arcade.Window):
         charecters[0]['coordinates'][1] = self.person_sprite.change_y+self.person_sprite.center_y
         self.person_sprite.position = [charecters[0]['coordinates'][0], charecters[0]['coordinates'][1]]
         self.scene.get_sprite_list("People").clear()
+        self.person_sprite.z = 10000
         self.scene.add_sprite("People", self.person_sprite)
         self.score = round(self.score+1/10,0)
         # Move the player with the physics engine
